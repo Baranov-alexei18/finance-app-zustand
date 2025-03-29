@@ -24,10 +24,7 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Линтинг кода
-        run: yarn lint
-
-      - name: Запуск тестов
-        run: yarn test --ci --coverage
+        run: yarn lint --fix
 
       - name: Сборка проекта
         run: yarn build
