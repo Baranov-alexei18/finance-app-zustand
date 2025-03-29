@@ -40,7 +40,7 @@ export const LayoutApp = () => {
         />
       </Sider>
       <Layout>
-        <Header className={styles.headerWrapper}>Personal Finance App</Header>
+        <Header className={styles.headerWrapper}>Personal Finance app</Header>
         <Content className={styles.contentWrapper}>
           <Outlet />
         </Content>
