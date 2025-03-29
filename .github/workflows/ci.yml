@@ -1,0 +1,31 @@
+name: Github Action CI
+
+on:
+  push:
+    branches: [master, develop]
+  pull_request:
+    branches: [master, develop]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout репозитория
+        uses: actions/checkout@v4
+
+      - name: Установка Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.14.0
+          cache: 'yarn'
+
+      - name: Установка зависимостей
+        run: yarn install --frozen-lockfile
+
+      - name: Линтинг кода
+        run: yarn lint --fix
+
+      - name: Очистка кеша Vite
+        run: rm -rf node_modules/.vite dist
+
