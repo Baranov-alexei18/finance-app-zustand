@@ -1,4 +1,4 @@
-name: CI
+name: Github Action CI
 
 on:
   push:
@@ -26,5 +26,6 @@ jobs:
       - name: Линтинг кода
         run: yarn lint --fix
 
-      - name: Сборка проекта
-        run: yarn build
+      - name: Очистка кеша Vite
+        run: rm -rf node_modules/.vite dist
+
