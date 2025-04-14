@@ -11,6 +11,14 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  --color-bg: #ffffff;
+  --color-text: #121212;
+  --color-indigo: #7596d9; /* Indigo 600 */
+  --color-indigo-secondary: #6366f1; /* Indigo 500 */
+  --color-accent: #22c55e; /* Green 500 */
+  --color-muted: #f3f4f6; /* Gray-100 */
+  --color-border: #e5e7eb;
 }
 
 a {
