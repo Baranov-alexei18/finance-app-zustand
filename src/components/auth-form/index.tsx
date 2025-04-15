@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
 import type { FormProps } from 'antd';
-import { Button, Checkbox, Flex, Form, Input, notification } from 'antd';
+import { Button, Checkbox, Flex, Form, Input } from 'antd';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 
 import styles from './styles.module.css';
@@ -10,6 +9,7 @@ import { checkPassword } from '../../utils/check-password';
 import { User } from '../../types/user';
 import { useNavigate } from 'react-router';
 import { PATHS } from '../../constants/route-path';
+import { useNotificationStore } from '../../store/notificationStore';
 
 type Props = {
   switchToRegister: () => void;
@@ -21,25 +21,8 @@ type AuthFormProps = {
 
 export const AuthForm = ({ switchToRegister }: Props) => {
   const navigate = useNavigate();
-
+  const { setNotification } = useNotificationStore();
   const [fetchUserByEmail, { loading }] = useLazyQuery<AuthFormProps>(GET_USER_BY_EMAIL);
-
-  const [api, contextHolder] = notification.useNotification();
-  const [isSuccess, setIsSuccess] = useState(false);
-
-  const openNotificationWithIcon = () => {
-    api['success']({
-      message: 'Успешный вход',
-      description: 'Вы успешно вошли в систему.',
-    });
-  };
-
-  useEffect(() => {
-    if (isSuccess) {
-      openNotificationWithIcon();
-      setIsSuccess(false);
-    }
-  }, [isSuccess]);
 
   const onFinish: FormProps<User>['onFinish'] = async (values) => {
     if (!values.email || !values.password) {
@@ -59,7 +42,11 @@ export const AuthForm = ({ switchToRegister }: Props) => {
         return;
       }
 
-      setIsSuccess(true);
+      setNotification({
+        type: 'success',
+        message: 'Успешный вход',
+        description: 'Вы успешно вошли в систему.',
+      });
       navigate(PATHS.home);
     } catch (e) {
       console.error(e);
@@ -72,7 +59,6 @@ export const AuthForm = ({ switchToRegister }: Props) => {
 
   return (
     <div className={styles.wrapper}>
-      {contextHolder}
       <Form
         name="login"
         initialValues={{ remember: true }}
