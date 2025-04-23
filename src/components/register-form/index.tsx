@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
 import type { FormProps } from 'antd';
-import { Button, Form, Input, notification } from 'antd';
+import { Button, Form, Input } from 'antd';
 import { LockOutlined, UserAddOutlined, UserOutlined } from '@ant-design/icons';
 
 import styles from './styles.module.css';
@@ -8,6 +7,7 @@ import { DocumentNode, OperationVariables, TypedDocumentNode, useMutation } from
 import { CREATE_USER, REGISTER_CREATE_USER } from '../../lib/graphQL/users';
 import { User } from '../../types/user';
 import { getHashPassword } from '../../utils/getHashPassword';
+import { useNotificationStore } from '../../store/notificationStore';
 
 type Props = {
   switchToAuth: () => void;
@@ -25,40 +25,13 @@ export const RegisterForm = ({ switchToAuth }: Props) => {
   const [createNewUser, { loading }] = useMutation<AuthFormResponse>(CREATE_USER);
   const [publishNewUser] = useMutation(REGISTER_CREATE_USER);
 
-  const [api, contextHolder] = notification.useNotification();
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
-
-  const openNotificationWithIcon = () => {
-    api['success']({
-      message: 'Регистрация',
-      description: 'Новый аккаунт успешно зарегестрирован',
-    });
-  };
-
-  const openErrorNotification = (description: string) => {
-    api['error']({
-      message: 'Регистрация не пройдена',
-      description,
-    });
-  };
-
-  useEffect(() => {
-    if (isSuccess) {
-      openNotificationWithIcon();
-      setIsSuccess(false);
-    }
-
-    if (errorMsg && errorMsg!.length > 0) {
-      openErrorNotification(errorMsg!);
-      setErrorMsg(null);
-    }
-  }, [errorMsg, isSuccess]);
+  const { setNotification } = useNotificationStore();
 
   const onFinish: FormProps<User>['onFinish'] = async (values) => {
     if (!values.email || !values.password) {
       return;
     }
+
     const hashPassword = await getHashPassword(values.password);
 
     const formData = {
@@ -84,10 +57,19 @@ export const RegisterForm = ({ switchToAuth }: Props) => {
         throw new Error('Не удалось сохранить учетную запись пользователя');
       }
 
-      setIsSuccess(true);
+      setNotification({
+        type: 'success',
+        message: 'Регистрация',
+        description: 'Новый аккаунт успешно зарегестрирован',
+      });
+
       switchToAuth();
     } catch (e) {
-      setErrorMsg(e as unknown as string);
+      setNotification({
+        type: 'error',
+        message: 'Регистрация не пройдена',
+        description: e as unknown as string,
+      });
     }
   };
 
@@ -97,7 +79,6 @@ export const RegisterForm = ({ switchToAuth }: Props) => {
 
   return (
     <div className={styles.wrapper}>
-      {contextHolder}
       <Form
         name="login"
         initialValues={{ remember: true }}

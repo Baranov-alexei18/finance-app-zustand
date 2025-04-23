@@ -18,6 +18,35 @@ export const GET_USER_BY_EMAIL = gql`
   }
 `;
 
+export const GET_USER_BY_ID = gql`
+  query GetUserId($id: ID!) {
+    authUser(where: { id: $id }) {
+      id
+      email
+      password
+      name
+      avatar {
+        id
+      }
+      transitions {
+        id
+        amount
+        createdAt
+        date
+        note
+        type
+      }
+      categories {
+        id
+        name
+        type
+        updatedAt
+        publishedAt
+      }
+    }
+  }
+`;
+
 export const CREATE_USER = gql`
   mutation CreateUser($data: AuthUserCreateInput!) {
     createAuthUser(data: $data) {

@@ -15,8 +15,26 @@ export const MENU_ITEMS = [
     key: '',
     icon: <VideoCameraOutlined />,
     label: (
-      <NavLink to="/auth" end>
-        Auth
+      <NavLink to="/" end>
+        Income
+      </NavLink>
+    ),
+  },
+  {
+    key: '',
+    icon: <VideoCameraOutlined />,
+    label: (
+      <NavLink to="/" end>
+        Expense
+      </NavLink>
+    ),
+  },
+  {
+    key: '',
+    icon: <VideoCameraOutlined />,
+    label: (
+      <NavLink to="/" end>
+        Goal
       </NavLink>
     ),
   },
