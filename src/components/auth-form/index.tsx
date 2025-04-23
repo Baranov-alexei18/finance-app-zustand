@@ -47,6 +47,7 @@ export const AuthForm = ({ switchToRegister }: Props) => {
         message: 'Успешный вход',
         description: 'Вы успешно вошли в систему.',
       });
+      sessionStorage.setItem('userId', data.authUser.id);
       navigate(PATHS.home);
     } catch (e) {
       console.error(e);

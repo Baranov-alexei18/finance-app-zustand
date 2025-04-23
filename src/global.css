@@ -19,6 +19,7 @@
   --color-accent: #22c55e; /* Green 500 */
   --color-muted: #f3f4f6; /* Gray-100 */
   --color-border: #e5e7eb;
+  --color-border-dark: #26282c;
 }
 
 a {
