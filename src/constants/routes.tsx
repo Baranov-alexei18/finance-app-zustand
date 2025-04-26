@@ -1,6 +1,7 @@
 import { createBrowserRouter } from 'react-router';
 
 import { ProtectedRoute } from '@/components/protected-route';
+import { EditPage } from '@/pages/edit';
 
 import { LayoutApp } from '../components/base-layout';
 import { AuthPage } from '../pages/auth';
@@ -40,6 +41,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <ExpensePage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: ROUTE_PATHS.edit,
+        element: (
+          <ProtectedRoute>
+            <EditPage />
           </ProtectedRoute>
         ),
       },

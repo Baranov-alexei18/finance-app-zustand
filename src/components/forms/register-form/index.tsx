@@ -24,7 +24,7 @@ type AuthFormResponse = {
 
 export const RegisterForm = ({ switchToAuth }: Props) => {
   const [createNewUser, { loading }] = useMutation<AuthFormResponse>(CREATE_USER);
-  const [publishNewUser] = useMutation(REGISTER_CREATE_USER);
+  const [publishUser] = useMutation(REGISTER_CREATE_USER);
 
   const { setNotification } = useNotificationStore();
 
@@ -50,7 +50,7 @@ export const RegisterForm = ({ switchToAuth }: Props) => {
         throw new Error('Не удалось создать пользователя');
       }
 
-      const { data: userId } = await publishNewUser({
+      const { data: userId } = await publishUser({
         variables: { id: data.createAuthUser.id },
       });
 

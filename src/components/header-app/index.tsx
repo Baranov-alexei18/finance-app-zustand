@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router';
+import { NavLink, useNavigate } from 'react-router';
 import { DownOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Button, Dropdown, Layout, MenuProps, Space } from 'antd';
 
@@ -29,11 +29,7 @@ export const HeaderApp = () => {
       disabled: true,
     },
     {
-      label: (
-        <a target="_blank" rel="noopener noreferrer" href="https://www.aliyun.com">
-          Редактировать
-        </a>
-      ),
+      label: <NavLink to={ROUTE_PATHS.edit}>Редактировать</NavLink>,
       key: '2',
     },
     {
@@ -57,7 +53,7 @@ export const HeaderApp = () => {
             <Avatar
               size={40}
               icon={
-                user?.avatar.url ? <img src={user.avatar.url} alt="Avatar" /> : <UserOutlined />
+                user?.avatar?.url ? <img src={user.avatar.url} alt="Avatar" /> : <UserOutlined />
               }
             />
             {user?.name || 'Name'}
