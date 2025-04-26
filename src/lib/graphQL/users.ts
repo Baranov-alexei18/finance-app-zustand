@@ -63,3 +63,24 @@ export const GET_AUTH_USERS = gql`
     }
   }
 `;
+
+export const EDIT_USER = gql`
+  mutation EditUser($id: ID!, $data: AuthUserUpdateInput!) {
+    updateAuthUser(where: { id: $id }, data: $data) {
+      id
+      name
+      password
+      avatar {
+        id
+      }
+    }
+  }
+`;
+
+export const SAVE_AVATAR = gql`
+  mutation CreateUser($data: AuthUserCreateInput!) {
+    createAuthUser(data: $data) {
+      id
+    }
+  }
+`;

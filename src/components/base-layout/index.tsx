@@ -1,12 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { useEffect, useLayoutEffect, useState } from 'react';
-import { Outlet, useNavigate } from 'react-router';
+import { useEffect, useState } from 'react';
+import { Outlet } from 'react-router';
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import { useLazyQuery } from '@apollo/client';
 import { Button, Layout, Menu, notification } from 'antd';
 
-import { ROUTE_PATHS } from '@/constants/route-path';
 import { GET_USER_BY_ID } from '@/lib/graphQL/users';
 import { NotificationType, useNotificationStore } from '@/store/notificationStore';
 import { useUserStore } from '@/store/userStore';
@@ -19,8 +18,6 @@ import styles from './styles.module.css';
 const { Sider, Content } = Layout;
 
 export const LayoutApp = () => {
-  const navigate = useNavigate();
-
   const [collapsed, setCollapsed] = useState(false);
   const [api, contextHolder] = notification.useNotification();
   const { notification: notificationData, removeNotification } = useNotificationStore();
@@ -28,18 +25,26 @@ export const LayoutApp = () => {
 
   const [fetchUserById] = useLazyQuery<any>(GET_USER_BY_ID);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const id = sessionStorage.getItem('userId');
+
+    const getUserById = async (id: string) => {
+      if (!id) return;
+
+      try {
+        const { data } = await fetchUserById({ variables: { id } });
+
+        setUser(data.authUser);
+      } catch (e) {
+        console.error(e);
+        setUser({});
+      }
+    };
 
     if (id) {
       getUserById(id);
-      return;
     }
-
-    if (!id) {
-      navigate(ROUTE_PATHS.auth);
-    }
-  }, [navigate]);
+  }, [fetchUserById, setUser]);
 
   useEffect(() => {
     if (notificationData?.type) {
@@ -47,19 +52,6 @@ export const LayoutApp = () => {
       removeNotification();
     }
   }, [notificationData]);
-
-  const getUserById = async (id: string) => {
-    if (!id) return;
-
-    try {
-      const { data } = await fetchUserById({ variables: { id } });
-
-      setUser(data.authUser);
-    } catch (e) {
-      console.error(e);
-      setUser([]);
-    }
-  };
 
   const viewNotification = (data: NotificationType | null) => {
     if (!data) return;

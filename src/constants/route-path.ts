@@ -4,4 +4,5 @@ export const ROUTE_PATHS = {
   income: '/income',
   expense: '/expense',
   goals: '/goals',
+  edit: '/edit',
 };
