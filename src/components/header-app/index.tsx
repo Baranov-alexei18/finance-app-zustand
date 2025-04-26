@@ -56,10 +56,11 @@ export const HeaderApp = () => {
           <Space>
             <Avatar
               size={40}
-              icon={<UserOutlined />}
-              //   icon={1 === '1' ? <UserOutlined /> : <img src="/avatar.jpg" alt="Avatar" />}
+              icon={
+                user?.avatar.url ? <img src={user.avatar.url} alt="Avatar" /> : <UserOutlined />
+              }
             />
-            {user?.name || 'Accoun Name or email'}
+            {user?.name || 'Name'}
             <DownOutlined />
           </Space>
         </a>

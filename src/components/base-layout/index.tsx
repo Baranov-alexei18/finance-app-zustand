@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router';
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import { useLazyQuery } from '@apollo/client';
@@ -28,7 +28,7 @@ export const LayoutApp = () => {
 
   const [fetchUserById] = useLazyQuery<any>(GET_USER_BY_ID);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const id = sessionStorage.getItem('userId');
 
     if (id) {
