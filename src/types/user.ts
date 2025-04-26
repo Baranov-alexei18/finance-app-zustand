@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export type User = {
+export type UserType = {
   id: string;
   email: string;
   password: string;

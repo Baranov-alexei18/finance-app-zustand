@@ -1,11 +1,11 @@
-import { Avatar, Layout, Dropdown, Space, Button, MenuProps } from 'antd';
-import styles from './styles.module.css';
-
-import { DownOutlined, UserOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router';
-import { PATHS } from '../../constants/route-path';
+import { DownOutlined, UserOutlined } from '@ant-design/icons';
+import { Avatar, Button, Dropdown, Layout, MenuProps, Space } from 'antd';
 
+import { ROUTE_PATHS } from '../../constants/route-path';
 import { useUserStore } from '../../store/userStore';
+
+import styles from './styles.module.css';
 
 const { Header } = Layout;
 
@@ -14,7 +14,7 @@ export const HeaderApp = () => {
   const { user } = useUserStore();
 
   const handleExit = () => {
-    navigate(PATHS.auth);
+    navigate(ROUTE_PATHS.auth);
     sessionStorage.removeItem('userId');
   };
 

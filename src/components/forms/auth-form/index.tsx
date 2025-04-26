@@ -1,22 +1,23 @@
+import { useNavigate } from 'react-router';
+import { LockOutlined, UserOutlined } from '@ant-design/icons';
+import { useLazyQuery } from '@apollo/client';
 import type { FormProps } from 'antd';
 import { Button, Checkbox, Flex, Form, Input } from 'antd';
-import { LockOutlined, UserOutlined } from '@ant-design/icons';
+
+import { ROUTE_PATHS } from '@/constants/route-path';
+import { GET_USER_BY_EMAIL } from '@/lib/graphQL/users';
+import { useNotificationStore } from '@/store/notificationStore';
+import { UserType } from '@/types/user';
+import { checkPassword } from '@/utils/check-password';
 
 import styles from './styles.module.css';
-import { useLazyQuery } from '@apollo/client';
-import { GET_USER_BY_EMAIL } from '../../lib/graphQL/users';
-import { checkPassword } from '../../utils/check-password';
-import { User } from '../../types/user';
-import { useNavigate } from 'react-router';
-import { PATHS } from '../../constants/route-path';
-import { useNotificationStore } from '../../store/notificationStore';
 
 type Props = {
   switchToRegister: () => void;
 };
 
 type AuthFormProps = {
-  authUser: User;
+  authUser: UserType;
 };
 
 export const AuthForm = ({ switchToRegister }: Props) => {
@@ -24,7 +25,7 @@ export const AuthForm = ({ switchToRegister }: Props) => {
   const { setNotification } = useNotificationStore();
   const [fetchUserByEmail, { loading }] = useLazyQuery<AuthFormProps>(GET_USER_BY_EMAIL);
 
-  const onFinish: FormProps<User>['onFinish'] = async (values) => {
+  const onFinish: FormProps<UserType>['onFinish'] = async (values) => {
     if (!values.email || !values.password) {
       return;
     }
@@ -39,7 +40,7 @@ export const AuthForm = ({ switchToRegister }: Props) => {
       const result = await checkPassword(values.password, data.authUser.password!);
 
       if (!result) {
-        return;
+        throw new Error('Не верный пароль');
       }
 
       setNotification({
@@ -48,13 +49,17 @@ export const AuthForm = ({ switchToRegister }: Props) => {
         description: 'Вы успешно вошли в систему.',
       });
       sessionStorage.setItem('userId', data.authUser.id);
-      navigate(PATHS.home);
+      navigate(ROUTE_PATHS.home);
     } catch (e) {
-      console.error(e);
+      setNotification({
+        type: 'error',
+        message: 'Ошибка',
+        description: String(e),
+      });
     }
   };
 
-  const onFinishFailed: FormProps<User>['onFinishFailed'] = (errorInfo) => {
+  const onFinishFailed: FormProps<UserType>['onFinishFailed'] = (errorInfo) => {
     console.log('Failed:', errorInfo);
   };
 

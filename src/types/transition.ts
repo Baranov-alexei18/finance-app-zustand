@@ -1,10 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export type Transition = {
+export enum TransitionEnum {
+  EXPENSE = 'EXPENSE',
+  INCOME = 'INCOME',
+}
+
+export type TransitionType = {
   id: string;
-  email: string;
-  password: string;
-  name: string;
-  avatar: any;
-  transitions: any;
-  categories: any;
+  amout: number;
+  date: Date;
+  note: string;
+  type: TransitionEnum.EXPENSE | TransitionEnum.INCOME;
+  goal: any;
+  authUser: string;
+  category: any;
 };

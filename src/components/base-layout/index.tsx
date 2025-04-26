@@ -1,17 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useEffect, useState } from 'react';
-import { Button, Layout, Menu, notification } from 'antd';
 import { Outlet, useNavigate } from 'react-router';
-import { MENU_ITEMS } from './constants';
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
-import styles from './styles.module.css';
-import { NotificationType, useNotificationStore } from '../../store/notificationStore';
-import { PATHS } from '../../constants/route-path';
-import { HeaderApp } from '../header-app';
-import { GET_USER_BY_ID } from '../../lib/graphQL/users';
 import { useLazyQuery } from '@apollo/client';
-import { useUserStore } from '../../store/userStore';
+import { Button, Layout, Menu, notification } from 'antd';
+
+import { ROUTE_PATHS } from '@/constants/route-path';
+import { GET_USER_BY_ID } from '@/lib/graphQL/users';
+import { NotificationType, useNotificationStore } from '@/store/notificationStore';
+import { useUserStore } from '@/store/userStore';
+
+import { HeaderApp } from '../header-app';
+import { MENU_ITEMS } from './constants';
+
+import styles from './styles.module.css';
 
 const { Sider, Content } = Layout;
 
@@ -21,7 +24,7 @@ export const LayoutApp = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [api, contextHolder] = notification.useNotification();
   const { notification: notificationData, removeNotification } = useNotificationStore();
-  const { user, setUser } = useUserStore();
+  const { setUser } = useUserStore();
 
   const [fetchUserById] = useLazyQuery<any>(GET_USER_BY_ID);
 
@@ -34,7 +37,7 @@ export const LayoutApp = () => {
     }
 
     if (!id) {
-      navigate(PATHS.auth);
+      navigate(ROUTE_PATHS.auth);
     }
   }, [navigate]);
 
@@ -45,16 +48,12 @@ export const LayoutApp = () => {
     }
   }, [notificationData]);
 
-  console.log('globalData');
-  console.log(user);
-
   const getUserById = async (id: string) => {
     if (!id) return;
 
     try {
       const { data } = await fetchUserById({ variables: { id } });
-      console.log('data');
-      console.log(data);
+
       setUser(data.authUser);
     } catch (e) {
       console.error(e);
