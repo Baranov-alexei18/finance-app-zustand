@@ -1,20 +1,21 @@
+import { LockOutlined, UserAddOutlined, UserOutlined } from '@ant-design/icons';
+import { DocumentNode, OperationVariables, TypedDocumentNode, useMutation } from '@apollo/client';
 import type { FormProps } from 'antd';
 import { Button, Form, Input } from 'antd';
-import { LockOutlined, UserAddOutlined, UserOutlined } from '@ant-design/icons';
+
+import { CREATE_USER, REGISTER_CREATE_USER } from '@/lib/graphQL/users';
+import { useNotificationStore } from '@/store/notificationStore';
+import { UserType } from '@/types/user';
+import { getHashPassword } from '@/utils/getHashPassword';
 
 import styles from './styles.module.css';
-import { DocumentNode, OperationVariables, TypedDocumentNode, useMutation } from '@apollo/client';
-import { CREATE_USER, REGISTER_CREATE_USER } from '../../lib/graphQL/users';
-import { User } from '../../types/user';
-import { getHashPassword } from '../../utils/getHashPassword';
-import { useNotificationStore } from '../../store/notificationStore';
 
 type Props = {
   switchToAuth: () => void;
 };
 
 type AuthFormProps = {
-  authUser: User;
+  authUser: UserType;
 };
 
 type AuthFormResponse = {
@@ -27,7 +28,7 @@ export const RegisterForm = ({ switchToAuth }: Props) => {
 
   const { setNotification } = useNotificationStore();
 
-  const onFinish: FormProps<User>['onFinish'] = async (values) => {
+  const onFinish: FormProps<UserType>['onFinish'] = async (values) => {
     if (!values.email || !values.password) {
       return;
     }
@@ -41,11 +42,11 @@ export const RegisterForm = ({ switchToAuth }: Props) => {
     };
 
     try {
-      const { data } = (await createNewUser({
+      const { data } = await createNewUser({
         variables: { data: formData },
-      })) as { data: AuthFormResponse };
+      });
 
-      if (!data.createAuthUser.id) {
+      if (!data?.createAuthUser.id) {
         throw new Error('Не удалось создать пользователя');
       }
 
@@ -73,7 +74,7 @@ export const RegisterForm = ({ switchToAuth }: Props) => {
     }
   };
 
-  const onFinishFailed: FormProps<User>['onFinishFailed'] = (errorInfo) => {
+  const onFinishFailed: FormProps<UserType>['onFinishFailed'] = (errorInfo) => {
     console.log('Failed:', errorInfo);
   };
 

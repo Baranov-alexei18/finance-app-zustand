@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export type Category = {
+export type CategoryType = {
   id: string;
   email: string;
   password: string;

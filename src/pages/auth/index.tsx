@@ -1,11 +1,12 @@
-import { AuthForm } from '../../components/auth-form';
-import { notification, Tabs } from 'antd';
+import { useEffect, useState } from 'react';
 import type { TabsProps } from 'antd';
+import { notification, Tabs } from 'antd';
+
+import { AuthForm } from '@/components/forms/auth-form';
+import { RegisterForm } from '@/components/forms/register-form';
+import { NotificationType, useNotificationStore } from '@/store/notificationStore';
 
 import styles from './styles.module.css';
-import { useEffect, useState } from 'react';
-import { RegisterForm } from '../../components/register-form';
-import { NotificationType, useNotificationStore } from '../../store/notificationStore';
 
 export const AuthPage = () => {
   const [activeKey, setActiveKey] = useState('auth');

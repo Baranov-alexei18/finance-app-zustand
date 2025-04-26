@@ -1,4 +1,4 @@
-import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client';
+import { ApolloClient, HttpLink, InMemoryCache } from '@apollo/client';
 
 const apiKey = import.meta.env.VITE_HYGRAPH_AUTH_TOKEN;
 

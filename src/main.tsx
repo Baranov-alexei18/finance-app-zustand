@@ -1,10 +1,12 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import './global.css';
 import { RouterProvider } from 'react-router';
-import { router } from './constants/routes.tsx';
 import { ApolloProvider } from '@apollo/client';
+
+import { router } from './constants/routes.tsx';
 import client from './lib/apollo/index.ts';
+
+import './global.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
