@@ -2,18 +2,17 @@
 import { useState } from 'react';
 import { UserOutlined } from '@ant-design/icons';
 import { useMutation } from '@apollo/client';
-import { Avatar, Button, Form, Input, Typography, Upload } from 'antd';
+import { Avatar, Button, Form, Input, Popover, Spin, Typography } from 'antd';
 
 import { EDIT_USER, REGISTER_CREATE_USER } from '@/lib/graphQL/users';
+import { AvatarType, useAvatarStore } from '@/store/avatarStore';
 import { useNotificationStore } from '@/store/notificationStore';
 import { useUserStore } from '@/store/userStore';
 import { checkPassword } from '@/utils/check-password';
 import { getHashPassword } from '@/utils/getHashPassword';
-import { uploadFileToHygraph } from '@/utils/upload-file-to-hygraph';
 
 import styles from './styles.module.css';
 
-const MAX_FILE_SIZE_MB = 5;
 type EditFormProps = {
   updateAuthUser: { id: string };
 };
@@ -21,41 +20,14 @@ type EditFormProps = {
 export const EditProfileForm = () => {
   const { user } = useUserStore();
   const { setNotification } = useNotificationStore();
+  const { avatars, loading: loadingAvatars } = useAvatarStore();
+
   const [form] = Form.useForm();
   const [editUser, { loading }] = useMutation<EditFormProps>(EDIT_USER);
   const [publishUser] = useMutation(REGISTER_CREATE_USER);
 
-  const [avatarUrl, setAvatarUrl] = useState(user?.avatar?.url || '');
-  const [file, setFile] = useState<File | null>(null);
-
-  const beforeUpload = (file: File) => {
-    const isLt5M = file.size / 1024 / 1024 < MAX_FILE_SIZE_MB;
-    if (!isLt5M) {
-      setNotification({
-        type: 'error',
-        message: 'Ошибка',
-        description: 'Файл должен быть меньше 5MB',
-      });
-
-      return false;
-    }
-    return isLt5M;
-  };
-
-  const handleAvatarChange = (info: any) => {
-    const file = info.file;
-
-    console.log(file);
-
-    if (file && beforeUpload(file)) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setAvatarUrl(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-      setFile(file);
-    }
-  };
+  const [avatarData, setAvatarData] = useState<AvatarType | null>(null);
+  const [popoverVisible, setPopoverVisible] = useState(false);
 
   const onFinish = async (values: any) => {
     const { name, newPassword, confirmPassword } = values;
@@ -73,28 +45,20 @@ export const EditProfileForm = () => {
     try {
       const hashPassword = await getHashPassword(values.newPassword);
 
-      if (file) {
-        const data = await uploadFileToHygraph(file);
-        console.log('uploadFileToHygraph');
-        console.log(data);
-      }
-
       const formData = {
-        name: name || user.name,
+        name: name || user?.name,
         password: hashPassword,
-        // avatar: {
-        //   connect: { id: assetId },
-        // },
+        avatar: {
+          connect: { id: avatarData?.id || user?.avatar?.id || null },
+        },
       };
 
       const { data } = await editUser({
         variables: {
-          id: user.id,
+          id: user?.id,
           data: formData,
         },
       });
-
-      console.log(data);
 
       const { data: userId } = await publishUser({
         variables: { id: data?.updateAuthUser.id },
@@ -120,7 +84,11 @@ export const EditProfileForm = () => {
     }
   };
 
+  console.log(user);
+
   const validateOldPassword = async (_: any, value: string) => {
+    if (!user) return;
+
     if (!value) {
       return Promise.reject('Введите старый пароль');
     }
@@ -134,20 +102,47 @@ export const EditProfileForm = () => {
     return Promise.resolve();
   };
 
+  const handleAvatarSelect = (avatar: AvatarType) => {
+    setAvatarData(avatar);
+    setPopoverVisible(false);
+  };
+
   if (!user) return null;
 
   return (
     <div className={styles.wrapper}>
       <div className={styles.wrapperAvatar}>
         <Typography.Title level={2}>Редактировать профиль</Typography.Title>
-        <Upload showUploadList={false} beforeUpload={() => false} onChange={handleAvatarChange}>
+        <Popover
+          content={
+            loadingAvatars ? (
+              <Spin />
+            ) : (
+              <div className={styles.avatarList}>
+                {avatars?.map((avatar) => (
+                  <Avatar
+                    key={avatar.id}
+                    src={avatar.url}
+                    size={64}
+                    style={{ cursor: 'pointer', margin: 4 }}
+                    onClick={() => handleAvatarSelect(avatar)}
+                  />
+                ))}
+              </div>
+            )
+          }
+          title="Выберите аватар"
+          trigger="click"
+          open={popoverVisible}
+          onOpenChange={(visible) => setPopoverVisible(visible)}
+        >
           <Avatar
             size={128}
-            src={avatarUrl || user?.avatar?.url || 'null'}
+            src={avatarData?.url || user?.avatar?.url || undefined}
             icon={<UserOutlined />}
             style={{ cursor: 'pointer' }}
           />
-        </Upload>
+        </Popover>
         <Typography.Paragraph type="secondary" style={{ marginTop: 8 }}>
           Нажмите на фото, чтобы изменить
         </Typography.Paragraph>
