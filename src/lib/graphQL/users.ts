@@ -33,6 +33,10 @@ export const GET_USER_BY_ID = gql`
         id
         amount
         createdAt
+        category {
+          id
+          name
+        }
         date
         note
         type

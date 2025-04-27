@@ -37,7 +37,7 @@ export const LayoutApp = () => {
         setUser(data.authUser);
       } catch (e) {
         console.error(e);
-        setUser({});
+        setUser(null);
       }
     };
 
