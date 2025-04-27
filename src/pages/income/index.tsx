@@ -1,9 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { BaseCardLayout } from '@components/common-components/base-card-layout';
 import { TransitionForm } from '@components/forms/transition-form';
 import { NotificationType, useNotificationStore } from '@store/notificationStore';
 import { Flex, notification } from 'antd';
 
+import { TransitionTable } from '@/components/common-components/transition-table';
+import { useUserStore } from '@/store/userStore';
 import { TransitionEnum } from '@/types/transition';
 
 import styles from './styles.module.css';
@@ -11,6 +13,12 @@ import styles from './styles.module.css';
 export const IncomePage = () => {
   const { notification: notificationData, removeNotification } = useNotificationStore();
   const [api] = notification.useNotification();
+  const { user, getTransactionsByType, loading } = useUserStore();
+
+  const incomeTransitions = useMemo(
+    () => getTransactionsByType(TransitionEnum.INCOME),
+    [getTransactionsByType, user]
+  );
 
   useEffect(() => {
     if (notificationData?.type) {
@@ -37,6 +45,8 @@ export const IncomePage = () => {
     }
   };
 
+  if (loading) return <div>Loading...</div>;
+
   return (
     <div className={styles.wrapper}>
       <Flex className={styles.wrapperDashboard}>
@@ -45,6 +55,9 @@ export const IncomePage = () => {
         </BaseCardLayout>
         <BaseCardLayout>12341</BaseCardLayout>
       </Flex>
+      <BaseCardLayout>
+        <TransitionTable transitions={incomeTransitions} />
+      </BaseCardLayout>
     </div>
   );
 };

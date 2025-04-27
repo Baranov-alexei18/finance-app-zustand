@@ -6,7 +6,7 @@ export enum TransitionEnum {
 
 export type TransitionType = {
   id: string;
-  amout: number;
+  amount: number;
   date: Date;
   note: string;
   type: TransitionEnum.EXPENSE | TransitionEnum.INCOME;

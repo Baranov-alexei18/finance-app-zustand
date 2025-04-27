@@ -1,0 +1,14 @@
+.wrapper {
+  display: flex;
+  gap: 12px;
+}
+
+.inputColor {
+  width: 40px;
+  height: auto;
+  border: 'none';
+  background: inherit;
+  border: 1px solid grey;
+  border-radius: 8px;
+  cursor: 'pointer';
+}
