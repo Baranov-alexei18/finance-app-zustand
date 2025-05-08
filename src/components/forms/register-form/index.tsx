@@ -69,7 +69,7 @@ export const RegisterForm = ({ switchToAuth }: Props) => {
       setNotification({
         type: 'error',
         message: 'Регистрация не пройдена',
-        description: e as unknown as string,
+        description: String(e),
       });
     }
   };

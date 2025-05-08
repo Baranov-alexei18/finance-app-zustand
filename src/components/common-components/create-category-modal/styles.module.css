@@ -1,14 +1,11 @@
 .wrapper {
   display: flex;
   gap: 12px;
+  margin-top: 32px;
 }
 
-.inputColor {
-  width: 40px;
-  height: auto;
-  border: 'none';
-  background: inherit;
-  border: 1px solid grey;
-  border-radius: 8px;
-  cursor: 'pointer';
+.listItemWrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
