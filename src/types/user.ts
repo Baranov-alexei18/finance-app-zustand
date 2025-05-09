@@ -1,3 +1,6 @@
+import { CategoryType } from './category';
+import { TransitionType } from './transition';
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export type UserType = {
   id: string;
@@ -5,6 +8,6 @@ export type UserType = {
   password: string;
   name: string;
   avatar: any;
-  transitions: any;
-  categories: any;
+  transitions: TransitionType[];
+  categories: CategoryType[];
 };

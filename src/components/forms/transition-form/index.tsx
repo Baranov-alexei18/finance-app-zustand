@@ -1,33 +1,32 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { Button, DatePicker, Form, Input, Select, Typography } from 'antd';
 import dayjs from 'dayjs';
 
 import { CreateCategoryModal } from '@/components/common-components/create-category-modal';
+import { TransitionEditType } from '@/components/common-components/transition-table';
 import { CREATE_CATEGORY, REGISTER_CREATE_CATEGORY } from '@/lib/graphQL/category';
 import { CREATE_TRANSITION, REGISTER_CREATE_TRANSITION } from '@/lib/graphQL/transition';
 import { useNotificationStore } from '@/store/notificationStore';
 import { useUserStore } from '@/store/userStore';
-import { TransitionEnum } from '@/types/transition';
+import { TransitionEnum, TransitionType } from '@/types/transition';
+import { getCapitalizeFirstLetter } from '@/utils/get-capitalize-first-letter';
+
+import { CategoryFormProps, TransitionFormProps, TransitionFormType } from './types';
 
 import styles from './styles.module.css';
 
 type Props = {
   title: string;
   type: TransitionEnum;
+  data?: TransitionType;
+  onEdit?: (data: TransitionEditType) => void;
+  onCancel?: () => void;
 };
 
-type TransitionFormProps = {
-  createTransition: { id: string };
-};
-
-type CategoryFormProps = {
-  createCategory: { id: string };
-};
-
-export const TransitionForm = ({ title, type }: Props) => {
-  const { user, getCategoriesByType } = useUserStore();
+export const TransitionForm = ({ title, type, data, onEdit, onCancel }: Props) => {
+  const { user, getCategoriesByType, addNewCategory, addNewTransaction } = useUserStore();
   const { setNotification } = useNotificationStore();
 
   const [createTransition, { loading }] = useMutation<TransitionFormProps>(CREATE_TRANSITION);
@@ -37,21 +36,31 @@ export const TransitionForm = ({ title, type }: Props) => {
     useMutation<CategoryFormProps>(CREATE_CATEGORY);
   const [publishCategory] = useMutation(REGISTER_CREATE_CATEGORY);
 
+  const [form] = Form.useForm();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (data) {
+      form.setFieldsValue({
+        date: data.date ? dayjs(data.date) : null,
+        category: data.category?.id || null,
+        goal: data.goal?.id || null,
+        amount: String(data.amount),
+        note: data.note || '',
+      });
+    }
+  }, [data, form]);
 
   const categories = getCategoriesByType(TransitionEnum[type]).map(
     (item) => ({
       value: item.id,
-      label: item.name,
+      label: getCapitalizeFirstLetter(item.name),
     }),
     []
   );
-  const [form] = Form.useForm();
 
-  console.log('globalUser');
-  console.log(user);
-
-  const onFinish = async (values: any) => {
+  const onFinish = async (values: TransitionFormType) => {
     const formattedDate = values.date ? dayjs(values.date).format('YYYY-MM-DD') : null;
     const formData = {
       authUser: {
@@ -66,13 +75,18 @@ export const TransitionForm = ({ title, type }: Props) => {
       note: values.note || null,
     };
 
+    if (data) {
+      onEdit?.({ id: data.id, ...formData } as unknown as TransitionEditType);
+      return;
+    }
+
     try {
       const { data } = await createTransition({
         variables: { data: formData },
       });
 
       if (!data?.createTransition.id) {
-        throw new Error('Не удалось создать пользователя');
+        throw new Error('Не удалось создать запись');
       }
 
       const { data: transitionId } = await publishTransition({
@@ -80,18 +94,24 @@ export const TransitionForm = ({ title, type }: Props) => {
       });
 
       if (!transitionId) {
-        throw new Error('Не удалось сохранить учетную запись пользователя');
+        throw new Error('Не удалось сохранить запись');
       }
+
+      addNewTransaction(data.createTransition);
 
       setNotification({
         type: 'success',
         message: 'Успешно сохранено',
-        description: 'Статья доходов создана',
+        description: `Статья ${type === TransitionEnum.INCOME ? 'доходов' : 'расходов'} создана`,
       });
 
       handleReset();
     } catch (e) {
-      console.error('❌ Ошибка входа:', e);
+      setNotification({
+        type: 'error',
+        message: 'Ошибка',
+        description: String(e),
+      });
     }
   };
 
@@ -100,6 +120,11 @@ export const TransitionForm = ({ title, type }: Props) => {
   };
 
   const handleReset = () => {
+    if (data) {
+      onCancel?.();
+      return;
+    }
+
     form.resetFields();
   };
 
@@ -122,7 +147,7 @@ export const TransitionForm = ({ title, type }: Props) => {
         });
 
         if (!data?.createCategory.id) {
-          throw new Error('Не удалось сохранить новую катугорию');
+          throw new Error('Не удалось сохранить новую категорию');
         }
 
         const { data: categoryId } = await publishCategory({
@@ -130,8 +155,15 @@ export const TransitionForm = ({ title, type }: Props) => {
         });
 
         if (!categoryId) {
-          throw new Error('Не удалось сохранить новую катугорию');
+          throw new Error('Не удалось сохранить новую категорию');
         }
+
+        addNewCategory({
+          type: type,
+          name: value,
+          chartColor: color,
+          id: categoryId.publishCategory.id,
+        });
 
         setNotification({
           type: 'success',
@@ -172,29 +204,28 @@ export const TransitionForm = ({ title, type }: Props) => {
           <DatePicker size="large" style={{ width: '100%' }} />
         </Form.Item>
 
-        <Form.Item name="category" rules={[{ required: true, message: 'Обязательно' }]}>
-          <Select
-            showSearch
-            size="large"
-            placeholder="Категория"
-            options={[
-              ...categories,
-              { label: 'Добавить новую категорию', value: 'add_new_category' },
-            ]}
-            onSelect={(value) => {
-              if (value === 'add_new_category') {
-                setIsModalOpen(true);
+        <div className={styles.wrapperCategories}>
+          <Form.Item name="category">
+            <Select
+              showSearch
+              size="large"
+              placeholder="Категория"
+              defaultValue={categories[0]}
+              options={categories}
+              filterOption={(input, option) =>
+                (option?.label as string).toLowerCase().includes(input.toLowerCase())
               }
-            }}
-            filterOption={(input, option) =>
-              (option?.label as string).toLowerCase().includes(input.toLowerCase())
-            }
-            filterSort={(a, b) =>
-              (a.label as string).toLowerCase().localeCompare((b.label as string).toLowerCase())
-            }
-            allowClear
-          />
-        </Form.Item>
+              filterSort={(a, b) =>
+                (a.label as string).toLowerCase().localeCompare((b.label as string).toLowerCase())
+              }
+              style={{ flex: 1 }}
+              allowClear
+            />
+          </Form.Item>
+          <Button size="large" onClick={() => setIsModalOpen(true)}>
+            + Добавить
+          </Button>
+        </div>
 
         {type === TransitionEnum.INCOME && (
           <Form.Item name="goal">
@@ -231,7 +262,7 @@ export const TransitionForm = ({ title, type }: Props) => {
             Сохранить
           </Button>
           <Button size="large" type="default" onClick={handleReset} className={styles.cancelButton}>
-            Очистить
+            {data ? 'Отмена' : 'Очистить'}
           </Button>
         </Form.Item>
       </Form>
