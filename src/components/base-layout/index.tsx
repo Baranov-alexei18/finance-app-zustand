@@ -21,7 +21,6 @@ export const LayoutApp = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [api, contextHolder] = notification.useNotification();
   const { notification: notificationData, removeNotification } = useNotificationStore();
-  const { setUser } = useUserStore();
 
   const [fetchUserById] = useLazyQuery<any>(GET_USER_BY_ID);
 
@@ -32,19 +31,29 @@ export const LayoutApp = () => {
       if (!id) return;
 
       try {
+        useUserStore.setState({ loading: true, error: null });
+
         const { data } = await fetchUserById({ variables: { id } });
 
-        setUser(data.authUser);
+        if (data?.authUser) {
+          useUserStore.setState({ user: data.authUser, loading: false });
+        } else {
+          useUserStore.setState({ user: null, loading: false });
+        }
       } catch (e) {
         console.error(e);
-        setUser(null);
+        useUserStore.setState({
+          user: null,
+          error: Error('Ошибка загрузки пользователя'),
+          loading: false,
+        });
       }
     };
 
     if (id) {
       getUserById(id);
     }
-  }, [fetchUserById, setUser]);
+  }, [fetchUserById]);
 
   useEffect(() => {
     if (notificationData?.type) {

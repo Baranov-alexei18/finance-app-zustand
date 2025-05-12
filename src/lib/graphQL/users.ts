@@ -36,6 +36,7 @@ export const GET_USER_BY_ID = gql`
         category {
           id
           name
+          chartColor
         }
         date
         note

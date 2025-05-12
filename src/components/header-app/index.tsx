@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router';
 import { DownOutlined, EyeInvisibleOutlined, EyeOutlined, UserOutlined } from '@ant-design/icons';
-import { Avatar, Button, Dropdown, Flex, Layout, MenuProps, Space } from 'antd';
+import { Avatar, Button, Dropdown, Flex, Layout, MenuProps, Select, Space } from 'antd';
 
+import { GRANULARITY } from '@/constants/granularity';
+import { useGranularityStore } from '@/store/granularityStore';
 import { calculateBalance } from '@/utils/calculate-balance';
 
 import { ROUTE_PATHS } from '../../constants/route-path';
@@ -15,6 +17,7 @@ const { Header } = Layout;
 export const HeaderApp = () => {
   const navigate = useNavigate();
   const { user } = useUserStore();
+  const { setGranularityType } = useGranularityStore();
 
   const [balanceVisible, setBalanceVisible] = useState(
     sessionStorage.getItem('isBalanceVisible') === 'true'
@@ -36,7 +39,11 @@ export const HeaderApp = () => {
     sessionStorage.removeItem('isBalanceVisible');
   };
 
-  const items: MenuProps['items'] = [
+  const handleChange = (value: keyof typeof GRANULARITY) => {
+    setGranularityType(value);
+  };
+
+  const menuItems: MenuProps['items'] = [
     {
       label: (
         <Flex align="center" justify="space-between" style={{ width: '100%' }}>
@@ -67,11 +74,23 @@ export const HeaderApp = () => {
     },
   ];
 
+  const periodItems = Object.keys(GRANULARITY).map((item) => ({
+    value: item,
+    label: GRANULARITY[item as keyof typeof GRANULARITY],
+  }));
+
   return (
     <Header className={styles.headerWrapper}>
-      <Dropdown menu={{ items }} trigger={['click']}>
+      <Select
+        defaultValue={'month'}
+        className={styles.selectWrapper}
+        size="large"
+        onChange={handleChange}
+        options={periodItems}
+      />
+      <Dropdown menu={{ items: menuItems }} trigger={['click']}>
         <a onClick={(e) => e.preventDefault()}>
-          <Space>
+          <Space wrap align="center">
             <Avatar
               size={40}
               icon={
