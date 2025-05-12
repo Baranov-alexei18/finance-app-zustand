@@ -34,6 +34,7 @@ export const EDIT_TRANSITION = gql`
       category {
         id
         name
+        chartColor
       }
       date
       note

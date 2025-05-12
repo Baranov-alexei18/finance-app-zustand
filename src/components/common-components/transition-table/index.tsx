@@ -15,6 +15,8 @@ import { useUserStore } from '@/store/userStore';
 import { TransitionEnum, TransitionType } from '@/types/transition';
 import { getCapitalizeFirstLetter } from '@/utils/get-capitalize-first-letter';
 
+import { GranularityPicker } from '../granularity-picker';
+
 const { Panel } = Collapse;
 
 type Props = {
@@ -188,9 +190,12 @@ export const TransitionTable = ({ transitions }: Props) => {
 
   return (
     <Space direction="vertical" style={{ width: '100%' }}>
-      <Typography.Title level={3} style={{ marginBottom: 12, width: '100%' }}>
-        {`Все транзакции за { период }`}
-      </Typography.Title>
+      <Space size={20} align="center">
+        <Typography.Title level={3} style={{ marginTop: 12 }}>
+          {`Все транзакции за `}
+        </Typography.Title>
+        <GranularityPicker />
+      </Space>
 
       <Collapse style={{ width: '100%' }}>
         {Object.entries(grouped).map(([category, records]) => (

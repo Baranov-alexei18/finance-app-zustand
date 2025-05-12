@@ -4,6 +4,8 @@ import { TransitionForm } from '@components/forms/transition-form';
 import { NotificationType, useNotificationStore } from '@store/notificationStore';
 import { Flex, notification } from 'antd';
 
+import { ExplorerChart } from '@/components/charts/explorer';
+import { PieChart } from '@/components/charts/pie';
 import { TransitionTable } from '@/components/common-components/transition-table';
 import { useUserStore } from '@/store/userStore';
 import { TransitionEnum } from '@/types/transition';
@@ -45,16 +47,19 @@ export const IncomePage = () => {
     }
   };
 
-  if (loading) return <div>Loading...</div>;
-
   return (
     <div className={styles.wrapper}>
       <Flex className={styles.wrapperDashboard}>
         <BaseCardLayout>
           <TransitionForm title="Доходы" type={TransitionEnum.INCOME} />
         </BaseCardLayout>
-        <BaseCardLayout>12341</BaseCardLayout>
+        <BaseCardLayout>
+          <PieChart height={370} width={370} data={incomeTransitions} loading={loading} />
+        </BaseCardLayout>
       </Flex>
+      <BaseCardLayout>
+        <ExplorerChart height={600} width={1000} data={incomeTransitions} loading={loading} />
+      </BaseCardLayout>
       <BaseCardLayout>
         <TransitionTable transitions={incomeTransitions} />
       </BaseCardLayout>
