@@ -13,7 +13,7 @@ import { ROUTE_PATHS } from './route-path';
 
 export const router = createBrowserRouter([
   {
-    path: ROUTE_PATHS.home,
+    path: ROUTE_PATHS.main,
     element: (
       <ProtectedRoute>
         <LayoutApp />
@@ -22,6 +22,7 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
+        path: ROUTE_PATHS.home,
         element: (
           <ProtectedRoute>
             <HomePage />
