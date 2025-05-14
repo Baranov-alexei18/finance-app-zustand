@@ -60,6 +60,14 @@ export const TransitionForm = ({ title, type, data, onEdit, onCancel }: Props) =
     []
   );
 
+  const userGoals = user?.goals.map(
+    (item) => ({
+      value: item.id,
+      label: getCapitalizeFirstLetter(item.title),
+    }),
+    []
+  );
+
   const onFinish = async (values: TransitionFormType) => {
     const formattedDate = values.date ? dayjs(values.date).format('YYYY-MM-DD') : null;
     const formData = {
@@ -68,6 +76,9 @@ export const TransitionForm = ({ title, type, data, onEdit, onCancel }: Props) =
       },
       category: {
         connect: { id: values.category },
+      },
+      goal: {
+        connect: { id: values.goal },
       },
       type: type,
       date: formattedDate,
@@ -233,7 +244,7 @@ export const TransitionForm = ({ title, type, data, onEdit, onCancel }: Props) =
               showSearch
               size="large"
               placeholder="Цель"
-              options={categories}
+              options={userGoals}
               defaultValue={null}
               optionFilterProp="label"
               filterSort={(optionA, optionB) =>

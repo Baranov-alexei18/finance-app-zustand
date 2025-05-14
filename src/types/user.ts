@@ -1,4 +1,5 @@
 import { CategoryType } from './category';
+import { GoalType } from './goal';
 import { TransitionType } from './transition';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -10,4 +11,5 @@ export type UserType = {
   avatar: any;
   transitions: TransitionType[];
   categories: CategoryType[];
+  goals: GoalType[];
 };

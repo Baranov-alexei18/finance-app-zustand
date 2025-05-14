@@ -11,6 +11,12 @@ export const CREATE_TRANSITION = gql`
         name
         chartColor
       }
+      goal {
+        id
+        title
+        targetAmount
+        endDate
+      }
       date
       note
       type

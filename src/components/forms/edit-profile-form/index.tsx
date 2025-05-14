@@ -84,8 +84,6 @@ export const EditProfileForm = () => {
     }
   };
 
-  console.log(user);
-
   const validateOldPassword = async (_: any, value: string) => {
     if (!user) return;
 

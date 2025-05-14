@@ -50,6 +50,21 @@ export const GET_USER_BY_ID = gql`
         updatedAt
         publishedAt
       }
+      goals {
+        id
+        title
+        targetAmount
+        endDate
+        transitions {
+          id
+          amount
+          category {
+            name
+          }
+          date
+          note
+        }
+      }
     }
   }
 `;

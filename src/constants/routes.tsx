@@ -2,6 +2,7 @@ import { createBrowserRouter } from 'react-router';
 
 import { ProtectedRoute } from '@/components/protected-route';
 import { EditPage } from '@/pages/edit';
+import { GoalsPage } from '@/pages/goals';
 
 import { LayoutApp } from '../components/base-layout';
 import { AuthPage } from '../pages/auth';
@@ -50,6 +51,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <EditPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: ROUTE_PATHS.goals,
+        element: (
+          <ProtectedRoute>
+            <GoalsPage />
           </ProtectedRoute>
         ),
       },

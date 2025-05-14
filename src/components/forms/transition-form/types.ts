@@ -1,7 +1,7 @@
 import { CategoryType } from '@/types/category';
+import { GoalType } from '@/types/goal';
 import { TransitionEnum } from '@/types/transition';
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 export type TransitionFormProps = {
   createTransition: TransitionFormType;
 };
@@ -17,5 +17,5 @@ export type TransitionFormType = {
   type: TransitionEnum;
   category: CategoryType;
   note?: string;
-  goal?: any;
+  goal?: GoalType;
 };
