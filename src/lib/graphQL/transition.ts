@@ -9,6 +9,13 @@ export const CREATE_TRANSITION = gql`
       category {
         id
         name
+        chartColor
+      }
+      goal {
+        id
+        title
+        targetAmount
+        endDate
       }
       date
       note

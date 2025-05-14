@@ -29,7 +29,6 @@ export const PieChart = ({ data, height = 300, width = 300, loading = false }: P
     const categoryName = item?.category?.name || 'Без категории';
     const chartColor = item?.category?.chartColor || '#ccc';
 
-    console.log('item', item);
     if (!acc[categoryName]) {
       acc[categoryName] = { amount: item.amount, color: chartColor };
     } else {
@@ -127,7 +126,7 @@ export const PieChart = ({ data, height = 300, width = 300, loading = false }: P
         style={{ fontSize: 20, fill: hasData ? '#000' : '#999' }}
         x={height / 2}
         y={width / 2}
-        text={hasData ? `Total:\n ${total} y.e.` : 'Нет данных'}
+        text={hasData ? `Всего:\n ${total} y.e.` : 'Нет данных'}
       />
     </svg>
   );

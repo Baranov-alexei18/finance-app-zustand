@@ -125,7 +125,6 @@ export const CreateCategoryModal = ({ type, loading, isOpen, onClose, onAddCateg
 
   const toggleEdit = (itemId: string, currentName: string) => {
     if (editingId === itemId) {
-      console.log('save', itemId, currentName, editedName);
       if (editedName.trim() && editedName !== currentName) {
         updateCategory(itemId, { name: editedName.trim() });
       }

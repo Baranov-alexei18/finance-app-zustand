@@ -2,6 +2,7 @@
 import { create } from 'zustand';
 
 import { CategoryType } from '@/types/category';
+import { GoalType } from '@/types/goal';
 import { TransitionEnum, TransitionType } from '@/types/transition';
 import { UserType } from '@/types/user';
 
@@ -18,6 +19,7 @@ type Props = {
   addNewCategory: (category: CategoryType) => void;
   updateCategoryById: (id: string, updatedFields: Partial<CategoryType>) => void;
   deleteCategoryById: (id: string) => void;
+  addNewGoal: (goal: GoalType) => void;
 };
 
 export const useUserStore = create<Props>((set, get) => ({
@@ -35,40 +37,77 @@ export const useUserStore = create<Props>((set, get) => ({
     return user.transitions.filter((transaction: TransitionType) => transaction.type === type);
   },
 
-  addNewTransaction: (transaction: TransitionType) => {
+  addNewTransaction: (transition: TransitionType) => {
     const { user } = get();
 
     if (!user) {
       return;
     }
 
-    set({ user: { ...user, transitions: [...user.transitions, transaction] } });
+    console.log(transition);
+    set({
+      user: {
+        ...user,
+        transitions: [...user.transitions, transition],
+        goals: transition.goal
+          ? user.goals.map((goal) =>
+              goal.id === transition.goal?.id
+                ? { ...goal, transitions: [...(goal.transitions || []), transition] }
+                : goal
+            )
+          : user.goals,
+      },
+    });
   },
 
   updateTransactionById: (id: string, updatedFields: Partial<TransitionType>) => {
     const { user } = get();
+    if (!user) return;
 
-    if (!user) {
-      return;
-    }
-
-    const updatedCategories = user.transitions.map((transition) =>
+    const updatedTransitions = user.transitions.map((transition) =>
       transition.id === id ? { ...transition, ...updatedFields } : transition
     );
 
-    set({ user: { ...user, transitions: updatedCategories } });
+    const updatedGoals = updatedFields.goal
+      ? user.goals.map((goal) =>
+          goal.id === updatedFields.goal?.id
+            ? {
+                ...goal,
+                transitions: goal.transitions?.map((t) =>
+                  t.id === id ? { ...t, ...updatedFields } : t
+                ),
+              }
+            : goal
+        )
+      : user.goals;
+
+    set({
+      user: {
+        ...user,
+        transitions: updatedTransitions,
+        goals: updatedGoals,
+      },
+    });
   },
 
   deleteTransactionById: (id: string) => {
     const { user } = get();
+    if (!user) return;
 
-    if (!user) {
-      return;
-    }
+    const updatedTransitions = user.transitions.filter((transition) => transition.id !== id);
 
-    const updatedCategories = user.transitions.filter((transition) => transition.id !== id);
+    const updatedGoals = user.goals.map((goal) => ({
+      ...goal,
+      transitions: goal.transitions?.filter((t) => t.id !== id),
+    }));
 
-    set({ user: { ...user, transitions: updatedCategories } });
+    set({
+      user: {
+        ...user,
+        transitions: updatedTransitions,
+        goals: updatedGoals,
+      },
+    });
   },
 
   // user categories
@@ -113,5 +152,16 @@ export const useUserStore = create<Props>((set, get) => ({
     const updatedCategories = user.categories.filter((category) => category.id !== id);
 
     set({ user: { ...user, categories: updatedCategories } });
+  },
+
+  // user goals
+  addNewGoal: (goal: GoalType) => {
+    const { user } = get();
+
+    if (!user) {
+      return;
+    }
+
+    set({ user: { ...user, goals: [...user.goals, goal] } });
   },
 }));

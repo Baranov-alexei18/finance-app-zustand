@@ -1,7 +1,7 @@
 import { CategoryType } from './category';
+import { GoalType } from './goal';
 import { UserType } from './user';
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 export enum TransitionEnum {
   EXPENSE = 'EXPENSE',
   INCOME = 'INCOME',
@@ -13,7 +13,7 @@ export type TransitionType = {
   date: Date;
   note?: string;
   type: TransitionEnum.EXPENSE | TransitionEnum.INCOME;
-  goal?: any;
+  goal?: GoalType;
   authUser?: UserType;
   category?: CategoryType;
 };
