@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useEffect, useState } from 'react';
-import { Outlet } from 'react-router';
+import { Outlet, useLocation } from 'react-router';
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import { useLazyQuery } from '@apollo/client';
 import { Button, Layout, Menu, notification } from 'antd';
@@ -21,8 +21,11 @@ export const LayoutApp = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [api, contextHolder] = notification.useNotification();
   const { notification: notificationData, removeNotification } = useNotificationStore();
+  const location = useLocation();
 
   const [fetchUserById] = useLazyQuery<any>(GET_USER_BY_ID);
+
+  const selectedKey = location.pathname.split('/')[1] || 'home';
 
   useEffect(() => {
     const id = sessionStorage.getItem('userId');
@@ -105,7 +108,7 @@ export const LayoutApp = () => {
         <Menu
           theme="dark"
           mode="inline"
-          defaultSelectedKeys={['home']}
+          selectedKeys={[selectedKey]}
           items={MENU_ITEMS}
           className={styles.menuWrapper}
         />
