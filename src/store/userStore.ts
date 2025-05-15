@@ -44,7 +44,6 @@ export const useUserStore = create<Props>((set, get) => ({
       return;
     }
 
-    console.log(transition);
     set({
       user: {
         ...user,

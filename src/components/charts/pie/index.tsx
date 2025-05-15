@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Spin } from 'antd';
 import { VictoryContainer, VictoryLabel, VictoryPie, VictoryTheme, VictoryTooltip } from 'victory';
 
-import { TransitionType } from '@/types/transition';
+import { TransitionEnum, TransitionType } from '@/types/transition';
 import { getCapitalizeFirstLetter } from '@/utils/get-capitalize-first-letter';
 
 import styles from './styles.module.css';
@@ -12,9 +12,16 @@ type Props = {
   width?: number;
   data: TransitionType[];
   loading?: boolean;
+  isGroupedByType?: boolean;
 };
 
-export const PieChart = ({ data, height = 300, width = 300, loading = false }: Props) => {
+export const PieChart = ({
+  data,
+  height = 300,
+  width = 300,
+  loading = false,
+  isGroupedByType = false,
+}: Props) => {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   if (loading) {
@@ -25,32 +32,55 @@ export const PieChart = ({ data, height = 300, width = 300, loading = false }: P
     );
   }
 
-  const grouped = data.reduce<Record<string, { amount: number; color: string }>>((acc, item) => {
-    const categoryName = item?.category?.name || 'Без категории';
-    const chartColor = item?.category?.chartColor || '#ccc';
+  const grouped = isGroupedByType
+    ? data.reduce<Record<TransitionEnum, { amount: number; color: string }>>(
+        (acc, item) => {
+          const type = item.type;
+          const color = type === TransitionEnum.INCOME ? '#52c41a' : '#ff4d4f';
 
-    if (!acc[categoryName]) {
-      acc[categoryName] = { amount: item.amount, color: chartColor };
-    } else {
-      acc[categoryName].amount += item.amount;
-    }
+          if (!acc[type]) {
+            acc[type] = { amount: item.amount, color };
+          } else {
+            acc[type].amount += item.amount;
+          }
 
-    return acc;
-  }, {});
+          return acc;
+        },
+        {} as Record<TransitionEnum, { amount: number; color: string }>
+      )
+    : data.reduce<Record<string, { amount: number; color: string }>>((acc, item) => {
+        const categoryName = item?.category?.name || 'Без категории';
+        const chartColor = item?.category?.chartColor || '#ccc';
 
-  const total = Object.values(grouped).reduce((sum, val) => sum + val.amount, 0);
+        if (!acc[categoryName]) {
+          acc[categoryName] = { amount: item?.amount, color: chartColor };
+        } else {
+          acc[categoryName].amount += item?.amount;
+        }
 
-  const chartData = Object.entries(grouped).map(([category, { amount, color }]) => {
-    const percentage = ((amount / total) * 100).toFixed(2);
+        return acc;
+      }, {});
+
+  const total = isGroupedByType
+    ? Number(grouped?.INCOME?.amount || 0) - Number(grouped?.EXPENSE?.amount || 0)
+    : Object.values(grouped).reduce((sum, val) => sum + val.amount, 0);
+
+  const chartData = Object.entries(grouped).map(([label, { amount, color }]) => {
+    const totalAmount = isGroupedByType
+      ? Number(grouped?.INCOME?.amount || 0) + Number(grouped?.EXPENSE?.amount || 0)
+      : total;
+
+    const percentage = ((amount / totalAmount) * 100).toFixed(2);
+
     return {
-      x: category,
+      x: isGroupedByType ? (label === TransitionEnum.INCOME ? 'Доходы' : 'Расходы') : label,
       y: amount,
-      label: `${getCapitalizeFirstLetter(category)}\n ${amount} y.e. (${percentage}%)`,
+      label: `${getCapitalizeFirstLetter(isGroupedByType ? (label === TransitionEnum.INCOME ? 'Доходы' : 'Расходы') : label)}\n${amount?.toFixed(2)} y.e. (${percentage}%)`,
       color,
     };
   });
 
-  const hasData = !!chartData.length;
+  const hasData = chartData.length > 0;
 
   return (
     <svg viewBox={`0 0 ${height} ${width}`} style={{ width: `${width}px`, height: `${height}px` }}>
@@ -81,27 +111,15 @@ export const PieChart = ({ data, height = 300, width = 300, loading = false }: P
               onMouseOver: (_, props) => {
                 setActiveIndex(props.index);
                 return [
-                  {
-                    target: 'data',
-                    mutation: () => ({ active: true }),
-                  },
-                  {
-                    target: 'labels',
-                    mutation: () => ({ active: true }),
-                  },
+                  { target: 'data', mutation: () => ({ active: true }) },
+                  { target: 'labels', mutation: () => ({ active: true }) },
                 ];
               },
               onMouseOut: () => {
                 setActiveIndex(null);
                 return [
-                  {
-                    target: 'data',
-                    mutation: () => ({ active: false }),
-                  },
-                  {
-                    target: 'labels',
-                    mutation: () => ({ active: false }),
-                  },
+                  { target: 'data', mutation: () => ({ active: false }) },
+                  { target: 'labels', mutation: () => ({ active: false }) },
                 ];
               },
             },
@@ -126,7 +144,7 @@ export const PieChart = ({ data, height = 300, width = 300, loading = false }: P
         style={{ fontSize: 20, fill: hasData ? '#000' : '#999' }}
         x={height / 2}
         y={width / 2}
-        text={hasData ? `Всего:\n ${total} y.e.` : 'Нет данных'}
+        text={hasData ? `Всего:\n${total.toFixed(2)} y.e.` : 'Нет данных'}
       />
     </svg>
   );

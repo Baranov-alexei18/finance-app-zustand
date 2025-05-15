@@ -37,7 +37,7 @@ export const MENU_ITEMS = [
     ),
   },
   {
-    key: '',
+    key: 'goals',
     icon: <VideoCameraOutlined />,
     label: (
       <NavLink to={ROUTE_PATHS.goals} end>
