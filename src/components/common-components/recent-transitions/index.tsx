@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router';
 import { Button, List, Space, Tag, Typography } from 'antd';
 
 import { ROUTE_PATHS } from '@/constants/route-path';
@@ -10,6 +11,7 @@ type Props = {
 };
 
 export const RecentTransitions = ({ type, transitions }: Props) => {
+  const navigate = useNavigate();
   const filtered = transitions
     .filter((t) => t.type === type)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
@@ -42,8 +44,10 @@ export const RecentTransitions = ({ type, transitions }: Props) => {
         )}
       />
       <Button
-        variant="link"
-        href={type === TransitionEnum.INCOME ? ROUTE_PATHS.income : ROUTE_PATHS.expense}
+        variant="outlined"
+        onClick={() =>
+          navigate(type === TransitionEnum.INCOME ? ROUTE_PATHS.income : ROUTE_PATHS.expense)
+        }
       >
         {`Перейти к странице ${type === TransitionEnum.INCOME ? 'доходов' : 'расходов'}`}
       </Button>
