@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router';
 import { Button, Flex, List, notification, Progress, Space, Typography } from 'antd';
 import dayjs from 'dayjs';
 
@@ -18,6 +19,7 @@ import { getCapitalizeFirstLetter } from '@/utils/get-capitalize-first-letter';
 import styles from './styles.module.css';
 
 export const HomePage = () => {
+  const navigate = useNavigate();
   const { notification: notificationData, removeNotification } = useNotificationStore();
   const [api] = notification.useNotification();
   const { period, type } = useGranularityStore();
@@ -92,7 +94,11 @@ export const HomePage = () => {
                 );
               }}
             />
-            <Button variant="link" href={ROUTE_PATHS.goals} className={styles.goalsButton}>
+            <Button
+              variant="outlined"
+              className={styles.goalsButton}
+              onClick={() => navigate(ROUTE_PATHS.goals)}
+            >
               Перейти к созданию цели
             </Button>
           </Space>
